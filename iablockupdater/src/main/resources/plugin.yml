@@ -1,5 +1,5 @@
 main: com.cuddletheif.iablockupdater.IABlockUpdater
-name: ToolReplacer
+name: IABlockUpdater
 version: 0.1
 api-version: 1.18
 depend: ["ItemsAdder"]
