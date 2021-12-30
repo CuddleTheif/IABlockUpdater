@@ -7,16 +7,23 @@ import com.cuddletheif.iablockupdater.listeners.IABlockListener;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class IABlockUpdater extends JavaPlugin
 {
     IABlockListener listener;
+    FileConfiguration config;
 
     @Override
     public void onEnable() {
-        listener = new IABlockListener(this);
+
+        // Get and update the config
+        this.saveDefaultConfig();
+        this.config = this.getConfig();
+
+        listener = new IABlockListener(this, this.config.getBoolean("auto-update", true));
     }
 
     /**
@@ -27,19 +34,39 @@ public class IABlockUpdater extends JavaPlugin
 
         // Check which subcommand it is
         if(args[0].equals("on")){
+
             listener.setOn(true);
+            this.config.set("auto-update", true);
+            this.saveConfig();
             sender.sendMessage("Turned ON the auto updates for IABlockUpdater");
             return true;
+
         }
         else if(args[0].equals("off")){
+
             listener.setOn(false);
+            this.config.set("auto-update", false);
+            this.saveConfig();
             sender.sendMessage("Turned OFF the auto updates for IABlockUpdater");
             return true;
+
         }
         else if(args[0].equals("force")){
+
             sender.sendMessage("Force updating all IA Blocks in currently loaded Chunks");
             listener.updateAllBlocks();
             return true;
+
+        }
+        else if(args[0].equals("reload")){
+
+            this.reloadConfig();
+            this.saveDefaultConfig();
+            this.config = this.getConfig();
+            listener.setOn(this.config.getBoolean("auto-update", true));
+            sender.sendMessage("Reloaded the config file");
+            return true;
+
         }
         return false;
 
@@ -59,6 +86,7 @@ public class IABlockUpdater extends JavaPlugin
                 completions.add("on");
                 completions.add("off");
                 completions.add("force");
+                completions.add("reload");
             }
             else if("on".startsWith(args[0].trim()))
                 completions.add("on");
@@ -66,6 +94,8 @@ public class IABlockUpdater extends JavaPlugin
                 completions.add("off");
             else if("force".startsWith(args[0].trim()))
                 completions.add("force");
+            else if("force".startsWith(args[0].trim()))
+                completions.add("reload");
         }
 
         return completions;

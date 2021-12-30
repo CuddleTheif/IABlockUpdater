@@ -22,9 +22,16 @@ public class IABlockListener implements Listener
     private JavaPlugin plugin;
     private boolean on;
 
-    public IABlockListener(JavaPlugin plugin) {
+    /**
+     * Creates an IABlockListener for the given plugin with it default on or off
+     * 
+     * @param plugin The plugin owning this listener
+     * @param on If the auto updates should be on or off at start
+     */
+    public IABlockListener(JavaPlugin plugin, boolean on) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         this.plugin = plugin;
+        this.on = on;
     }
 
     /**
