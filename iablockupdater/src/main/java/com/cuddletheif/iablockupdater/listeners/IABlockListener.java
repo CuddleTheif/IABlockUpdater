@@ -55,7 +55,7 @@ public class IABlockListener implements Listener
      */
     @EventHandler(ignoreCancelled = true)
     public void onChunkLoad(ChunkLoadEvent e){
-        if(!e.isNewChunk())
+        if(on && !e.isNewChunk())
             updateChunk(e.getChunk());
     }
 
