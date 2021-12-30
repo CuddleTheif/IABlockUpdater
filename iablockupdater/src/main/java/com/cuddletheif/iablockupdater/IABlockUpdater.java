@@ -23,7 +23,7 @@ public class IABlockUpdater extends JavaPlugin
         this.saveDefaultConfig();
         this.config = this.getConfig();
 
-        listener = new IABlockListener(this, this.config.getBoolean("auto-update", true));
+        listener = new IABlockListener(this, this.config.getBoolean("auto-update", false));
     }
 
     /**
@@ -63,7 +63,7 @@ public class IABlockUpdater extends JavaPlugin
             this.reloadConfig();
             this.saveDefaultConfig();
             this.config = this.getConfig();
-            listener.setOn(this.config.getBoolean("auto-update", true));
+            listener.setOn(this.config.getBoolean("auto-update", false));
             sender.sendMessage("Reloaded the config file");
             return true;
 

@@ -8,4 +8,4 @@ commands:
  iablockupdate:
    aliases: iab
    description: "Turn on or off the IA Block Updater"
-   usage: "Please enter /iab [on|off|force]"
+   usage: "Please enter /iab [on|off|force|reload]"
