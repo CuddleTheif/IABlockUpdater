@@ -1,1 +1,2 @@
+# If the updater should check every block when a not new chunk is loaded
 auto-update: false
