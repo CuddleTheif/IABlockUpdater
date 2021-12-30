@@ -1,62 +1,95 @@
 package com.cuddletheif.iablockupdater.listeners;
 
+import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.lone.itemsadder.api.CustomBlock;
 
-
+/**
+ * Listener for checking if IA Blocks need to be updated
+ */
 public class IABlockListener implements Listener
 {
     private JavaPlugin plugin;
+    private boolean on;
 
     public IABlockListener(JavaPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onItemBreak(PlayerItemBreakEvent e){
-
-        
-
+    /**
+     * Turns on or off the IABlockListener
+     * 
+     * @param on If the listener should be on or off
+     */
+    public void setOn(boolean on){
+        this.on = on;
     }
 
+
+    /**
+     * Checks and updates all blocks current in the world
+     */
+    public void updateAllBlocks(){
+        List<World> worlds = Bukkit.getWorlds();
+        for(World world : worlds){
+            Chunk[] chunks = world.getLoadedChunks();
+            for(Chunk chunk : chunks)
+                updateChunk(chunk);
+        }
+    }
+
+    /**
+     * If the listener is on update on chunk loads but only if not new
+     * @param e The event triggered
+     */
     @EventHandler(ignoreCancelled = true)
     public void onChunkLoad(ChunkLoadEvent e){
+        if(!e.isNewChunk())
+            updateChunk(e.getChunk());
+    }
 
-        if(!e.isNewChunk()){
+    /**
+     * Checks and updates all the blocks in the given chunk
+     * 
+     * @param Block The chunk to check
+     */
+    private void updateChunk(Chunk chunk){
+        
+        try{
             for(int x=0;x<16;x++){
                 for(int z=0;z<16;z++){
                     for(int y=-64;y<321;y++){
-                        try{
-                            Block block = e.getChunk().getBlock(x, y, z);
-                            if(block!=null){
-                                CustomBlock iaBlock = CustomBlock.byAlreadyPlaced(block);
-                                if(iaBlock!=null){
-                                    String blockType = iaBlock.getConfig().getString("items."+iaBlock.getId()+".specific_properties.block.placed_model.type");
-                                    if((blockType.equals("REAL_NOTE") && block.getType()!=Material.NOTE_BLOCK) ||
-                                        (blockType.equals("TILE") && block.getType()!=Material.SPAWNER) ||
-                                        (blockType.equals("REAL_TRANSPARENT") && block.getType()!=Material.CHORUS_PLANT && block.getType()!=Material.CHORUS_FRUIT && block.getType()!=Material.CHORUS_FLOWER && block.getType()!=Material.POPPED_CHORUS_FRUIT) ||
-                                        (blockType.equals("REAL_WIRE") && block.getType()!=Material.TRIPWIRE) ||
-                                        (blockType.equals("FIRE") && block.getType()!=Material.FIRE) ||
-                                        (blockType.equals("REAL") && block.getType()!=Material.RED_MUSHROOM_BLOCK && block.getType()!=Material.BROWN_MUSHROOM_BLOCK)){
-                                            this.plugin.getLogger().info("IA BLOCK UPDATED:"+iaBlock.getDisplayName()+" FROM "+block.getType()+" TO "+blockType);
-                                            iaBlock.place(block.getLocation());
-                                    }
+                        Block block = chunk.getBlock(x, y, z);
+                        if(block!=null){
+                            CustomBlock iaBlock = CustomBlock.byAlreadyPlaced(block);
+                            if(iaBlock!=null){
+                                String blockType = iaBlock.getConfig().getString("items."+iaBlock.getId()+".specific_properties.block.placed_model.type");
+                                if((blockType.equals("REAL_NOTE") && block.getType()!=Material.NOTE_BLOCK) ||
+                                    (blockType.equals("TILE") && block.getType()!=Material.SPAWNER) ||
+                                    (blockType.equals("REAL_TRANSPARENT") && block.getType()!=Material.CHORUS_PLANT && block.getType()!=Material.CHORUS_FRUIT && block.getType()!=Material.CHORUS_FLOWER && block.getType()!=Material.POPPED_CHORUS_FRUIT) ||
+                                    (blockType.equals("REAL_WIRE") && block.getType()!=Material.TRIPWIRE) ||
+                                    (blockType.equals("FIRE") && block.getType()!=Material.FIRE) ||
+                                    (blockType.equals("REAL") && block.getType()!=Material.RED_MUSHROOM_BLOCK && block.getType()!=Material.BROWN_MUSHROOM_BLOCK)){
+                                        this.plugin.getLogger().info("IA BLOCK UPDATED:"+iaBlock.getDisplayName()+" FROM "+block.getType()+" TO "+blockType);
+                                        iaBlock.place(block.getLocation());
                                 }
                             }
                         }
-                        catch(IllegalArgumentException ex){}
                     }
                 }
             }
         }
-
+        catch(IllegalArgumentException ex){}
     }
 }

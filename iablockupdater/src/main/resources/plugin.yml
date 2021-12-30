@@ -3,3 +3,9 @@ name: ToolReplacer
 version: 0.1
 api-version: 1.18
 depend: ["ItemsAdder"]
+
+commands:
+ iablockupdate:
+   aliases: iab
+   description: "Turn on or off the IA Block Updater"
+   usage: "Please enter /iab [on|off|force]"
