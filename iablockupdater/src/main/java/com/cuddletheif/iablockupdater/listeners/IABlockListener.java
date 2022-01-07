@@ -60,7 +60,7 @@ public class IABlockListener implements Listener
      * If the listener is on update on chunk loads but only if not new
      * @param e The event triggered
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent e){
         if(on && !e.isNewChunk())
             updateChunk(e.getChunk());
@@ -71,32 +71,31 @@ public class IABlockListener implements Listener
      * 
      * @param Block The chunk to check
      */
-    private void updateChunk(Chunk chunk){
-        
-        try{
-            for(int x=0;x<16;x++){
-                for(int z=0;z<16;z++){
-                    for(int y=-64;y<321;y++){
+    private void updateChunk(Chunk chunk) {
+        try {
+            int highestBlockHeight;
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    highestBlockHeight = chunk.getWorld().getHighestBlockYAt(chunk.getX() * 16 + x, chunk.getZ() * 16 + z, HeightMap.WORLD_SURFACE);
+                    for (int y = chunk.getWorld().getMinHeight(); y < highestBlockHeight; y++) {
                         Block block = chunk.getBlock(x, y, z);
-                        if(block!=null){
-                            CustomBlock iaBlock = CustomBlock.byAlreadyPlaced(block);
-                            if(iaBlock!=null){
-                                String blockType = iaBlock.getConfig().getString("items."+iaBlock.getId()+".specific_properties.block.placed_model.type");
-                                if((blockType.equals("REAL_NOTE") && block.getType()!=Material.NOTE_BLOCK) ||
-                                    (blockType.equals("TILE") && block.getType()!=Material.SPAWNER) ||
-                                    (blockType.equals("REAL_TRANSPARENT") && block.getType()!=Material.CHORUS_PLANT && block.getType()!=Material.CHORUS_FRUIT && block.getType()!=Material.CHORUS_FLOWER && block.getType()!=Material.POPPED_CHORUS_FRUIT) ||
-                                    (blockType.equals("REAL_WIRE") && block.getType()!=Material.TRIPWIRE) ||
-                                    (blockType.equals("FIRE") && block.getType()!=Material.FIRE) ||
-                                    (blockType.equals("REAL") && block.getType()!=Material.RED_MUSHROOM_BLOCK && block.getType()!=Material.BROWN_MUSHROOM_BLOCK)){
-                                        this.plugin.getLogger().info("IA BLOCK UPDATED:"+iaBlock.getDisplayName()+" FROM "+block.getType()+" TO "+blockType);
-                                        iaBlock.place(block.getLocation());
-                                }
+                        CustomBlock iaBlock = CustomBlock.byAlreadyPlaced(block);
+                        if (iaBlock != null) {
+                            String blockType = iaBlock.getConfig().getString("items." + iaBlock.getId() + ".specific_properties.block.placed_model.type");
+                            assert blockType != null;
+                            if ((blockType.equals("REAL_NOTE") && block.getType() != Material.NOTE_BLOCK) ||
+                                    (blockType.equals("TILE") && block.getType() != Material.SPAWNER) ||
+                                    (blockType.equals("REAL_TRANSPARENT") && block.getType() != Material.CHORUS_PLANT && block.getType() != Material.CHORUS_FRUIT && block.getType() != Material.CHORUS_FLOWER && block.getType() != Material.POPPED_CHORUS_FRUIT) ||
+                                    (blockType.equals("REAL_WIRE") && block.getType() != Material.TRIPWIRE) ||
+                                    (blockType.equals("FIRE") && block.getType() != Material.FIRE) ||
+                                    (blockType.equals("REAL") && block.getType() != Material.RED_MUSHROOM_BLOCK && block.getType() != Material.BROWN_MUSHROOM_BLOCK)) {
+                                this.plugin.getLogger().info("IA BLOCK UPDATED:" + iaBlock.getDisplayName() + " FROM " + block.getType() + " TO " + blockType);
+                                iaBlock.place(block.getLocation());
                             }
                         }
                     }
                 }
             }
-        }
-        catch(IllegalArgumentException ex){}
+        } catch (IllegalArgumentException ignored) {}
     }
 }
