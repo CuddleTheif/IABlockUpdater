@@ -54,7 +54,8 @@ public class IABlockUpdater extends JavaPlugin
         else if(args[0].equals("force")){
 
             sender.sendMessage("Force updating all IA Blocks in currently loaded Chunks");
-            listener.updateAllBlocks();
+            int numUpdated = listener.updateAllBlocks();
+            sender.sendMessage("Updated "+numUpdated+" IA Blocks!");
             return true;
 
         }

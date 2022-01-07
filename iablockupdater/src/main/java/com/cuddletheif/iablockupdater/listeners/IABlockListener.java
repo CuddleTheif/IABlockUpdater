@@ -48,14 +48,17 @@ public class IABlockListener implements Listener
 
     /**
      * Checks and updates all blocks current in the world
+     * @return the actual number of blocks updated
      */
-    public void updateAllBlocks(){
+    public int updateAllBlocks(){
+        int blocksUpdated = 0;
         List<World> worlds = Bukkit.getWorlds();
         for(World world : worlds){
             Chunk[] chunks = world.getLoadedChunks();
             for(Chunk chunk : chunks)
-                updateChunk(chunk);
+            blocksUpdated += updateChunk(chunk);
         }
+        return blocksUpdated;
     }
 
     /**
@@ -72,8 +75,10 @@ public class IABlockListener implements Listener
      * Checks and updates all the blocks in the given chunk
      * 
      * @param Block The chunk to check
+     * @return the number of blocks actually updated
      */
-    private void updateChunk(Chunk chunk) {
+    private int updateChunk(Chunk chunk) {
+        int blocksUpdated = 0;
         try {
             int highestBlockHeight;
             for (int x = 0; x < 16; x++) {
@@ -93,11 +98,13 @@ public class IABlockListener implements Listener
                                     (blockType.equals("REAL") && block.getType() != Material.RED_MUSHROOM_BLOCK && block.getType() != Material.BROWN_MUSHROOM_BLOCK)) {
                                 this.plugin.getLogger().info("IA BLOCK UPDATED:" + iaBlock.getDisplayName() + " FROM " + block.getType() + " TO " + blockType);
                                 iaBlock.place(block.getLocation());
+                                blocksUpdated++;
                             }
                         }
                     }
                 }
             }
         } catch (IllegalArgumentException ignored) {}
+        return blocksUpdated;
     }
 }
